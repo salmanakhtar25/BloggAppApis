@@ -15,10 +15,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name="posts")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+
 public class Post {
 	
 	@Id
@@ -28,7 +34,7 @@ public class Post {
 	@Column(name="post_title",length = 100,nullable = false)
 	private String title;
 	
-	@Column(length=100000)
+	@Column(length=100000000)
 	private String content;
 	
 	private String imageName;

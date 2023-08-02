@@ -24,11 +24,16 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name="users")
-@Data
+@NoArgsConstructor
+@Getter
+@Setter
 public class User implements UserDetails{
 	
 	@Id
@@ -41,11 +46,11 @@ public class User implements UserDetails{
 	private String email;	
 	private String password;
 	
-	@ToString.Exclude
+
 	@OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private List<Post> post=new ArrayList<>();
 	
-	@ToString.Exclude
+
 	@ManyToMany(cascade = CascadeType.ALL,fetch=FetchType.EAGER)
 	@JoinTable(name="user_role",joinColumns = @JoinColumn(name="user",referencedColumnName = "id"),
 	inverseJoinColumns = @JoinColumn(name="role",referencedColumnName = "id"))

@@ -3,13 +3,16 @@ package com.codewithdurgesh.blog.payloads;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import com.codewithdurgesh.blog.entities.Comment;
-
-import lombok.Data;
-
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class PostDto {
+	
+	private Integer postId;
 	
 	private String title;
 	
@@ -24,5 +27,5 @@ public class PostDto {
 	
 	private UserDto user;
 	
-	private Set<Comment> comments=new HashSet<>();
+	private Set<CommentDto> comments=new HashSet<>();
 }

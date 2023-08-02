@@ -26,7 +26,7 @@ import com.codewithdurgesh.blog.services.FileService;
 import com.codewithdurgesh.blog.services.PostService;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api")
 public class PostController {
 	
 	@Autowired
