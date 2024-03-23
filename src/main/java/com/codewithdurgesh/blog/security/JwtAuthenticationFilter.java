@@ -1,8 +1,6 @@
 package com.codewithdurgesh.blog.security;
 
 import java.io.IOException;
-import java.util.Enumeration;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,80 +17,61 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter{
-	
-	@Autowired
-	private UserDetailsService userDetailsService;
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	@Autowired
-	private JwtTokenHelper jwtTokenHelper;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		
+    @Autowired
+    private JwtTokenHelper jwtTokenUtils;
 
-		String requestToken = request.getHeader("Authorization");
-		Enumeration<String> headerNames = request.getHeaderNames();
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-		while(headerNames.hasMoreElements())
-		{
-			System.out.println(headerNames.nextElement());
-		}
-		// Bearer 2352523sdgsg
+        if (isExcludedUrl(request.getRequestURI())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-		System.out.println(requestToken);
+        String requestToken = request.getHeader("Authorization");
+        String username = null;
+        String token = null;
 
-		String username = null;
+        if (requestToken != null && requestToken.startsWith("Bearer")) {
+            token = requestToken.substring(7);
 
-		String token = null;
+            try {
+                username = jwtTokenUtils.getUsernameFromToken(token);
+            } catch (IllegalArgumentException exception) {
+                System.out.println(exception.getMessage());
+            } catch (ExpiredJwtException exception) {
+                System.out.println(exception.getMessage());
+            } catch (MalformedJwtException exception) {
+                System.out.println(exception.getMessage());
+            }
 
-		if (requestToken != null && requestToken.startsWith("Bearer")) {
+        } else {
+            System.err.println("No Bearer");
+        }
 
-			token = requestToken.substring(7);
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (jwtTokenUtils.validateToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            } else {
+                System.err.println("Invalid JWT Token");
+            }
+        } else {
+            System.err.println("username is not null or context is not null");
+        }
 
-			try {
-				username = this.jwtTokenHelper.getUsernameFromToken(token);
-			} catch (IllegalArgumentException e) {
-				System.out.println("Unable to get Jwt token");
-			} catch (ExpiredJwtException e) {
-				System.out.println("Jwt token has expired");
-			} catch (MalformedJwtException e) {
-				System.out.println("invalid jwt");
+        filterChain.doFilter(request, response);
+    }
 
-			}
-
-		} else {
-			System.out.println("Jwt token does not begin with Bearer");
-		}
-
-		// once we get the token , now validate
-
-		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-			UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-			if (this.jwtTokenHelper.validateToken(token, userDetails)) {
-				// shi chal rha hai
-				// authentication karna hai
-
-				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
-				usernamePasswordAuthenticationToken
-						.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
-			} else {
-				System.out.println("Invalid jwt token");
-			}
-
-		} else {
-			System.out.println("username is null or context is not null");
-		}
-
-		
-		filterChain.doFilter(request, response);
-		
-	}
-
+    private boolean isExcludedUrl(String requestURI) {
+        // Define your excluded URL pattern(s) here
+        return requestURI.startsWith("/swagger") || requestURI.startsWith("/v2/api-docs");
+    }
 }
