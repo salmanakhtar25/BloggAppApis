@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
 	public UserDto registerNewUser(UserDto userDto) {
 		User user = this.modelMapper.map(userDto, User.class);
 		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-		Role role = this.roleRepo.findById(AppConstants.NORMAL_USER).get();
+		Role role = this.roleRepo.findById(AppConstants.ADMIN_USER).get();
 		user.getRoles().add(role);
 		User newUser = this.userRepo.save(user);		
 		return this.modelMapper.map(newUser, UserDto.class);
