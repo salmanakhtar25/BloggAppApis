@@ -25,11 +25,24 @@ import com.codewithdurgesh.blog.security.CustomUserDetailService;
 import com.codewithdurgesh.blog.security.JwtAuthenticationEntryPoint;
 import com.codewithdurgesh.blog.security.JwtAuthenticationFilter;
 
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 @Configuration
 @EnableWebMvc
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableSwagger2
 public class SecurityConfig {
+	
+	public static final String[] PUBLIC_URLS= {
+			"/v3/api-docs",
+			"/v2/api-docs",
+			"/swagger-resources/**",
+			"/webjars/**",
+			"/api/v1/auth/**",
+			"/api/users/register",
+			"/swagger-ui/**"
+	};
 	
 	@Autowired
 	private CustomUserDetailService customUserDetailService;
@@ -44,9 +57,8 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.csrf().
-		disable().authorizeHttpRequests().antMatchers("/v3/api-docs").permitAll().
-		antMatchers("/api/v1/auth/login").permitAll().
-		antMatchers("/api/users/register").permitAll().
+		disable().authorizeHttpRequests().
+		antMatchers(PUBLIC_URLS).permitAll().
 		anyRequest().authenticated().and()
 		.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
 		.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
