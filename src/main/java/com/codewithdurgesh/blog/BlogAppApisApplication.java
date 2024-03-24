@@ -15,7 +15,7 @@ import com.codewithdurgesh.blog.entities.Role;
 import com.codewithdurgesh.blog.repositories.RoleRepo;
 
 @SpringBootApplication()
-public class BlogAppApisApplication implements CommandLineRunner {
+public class BlogAppApisApplication  {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
