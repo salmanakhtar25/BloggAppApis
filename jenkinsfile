@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+    tools {
+        maven 'Maven 3.6.3'
+    }
+    stages {
+        stage('Build Maven') {
+            steps {
+                git branch: 'master', url: 'https://github.com/salmanakhtar25/BloggAppApis'
+                sh 'mvn clean install'
+            }
+        }
+       
+        stage('Build Docker image') {
+            steps {
+                script {
+                    sh 'docker build -t bloggappapisrtqa-integration .'
+                }
+            }
+        }
+       
+        stage('Push image to Hub') {
+            steps {
+                script {
+                    // Login to Docker Hub using credentials
+                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                        sh "docker login -u blogappp -p ${dockerhubpwd}"
+                    }
+                   
+                    // Tag the Docker image for Docker Hub repository
+                    sh 'docker tag bloggappapisrtqa-integration blogappp/bloggappapisrtqaq-integration'
+                   
+                    // Push the Docker image to Docker Hub
+                    sh 'docker push blogappp/bloggappapisrtqaq-integration'
+                }
+            }
+        }
+       
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    // Run Docker container
+                    sh 'docker run -d -p 9090:9090 --name blogfasaspringrtaqqq blogappp/bloggappapisrtqaq-integration'
+                }
+            }
+        }
+    }
+}
