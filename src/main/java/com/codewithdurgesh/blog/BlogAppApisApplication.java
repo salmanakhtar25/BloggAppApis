@@ -33,25 +33,25 @@ public class BlogAppApisApplication implements CommandLineRunner {
 		return new ModelMapper();
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-		System.out.println(this.passwordEncoder.encode("xyz"));
+	// @Override
+	// public void run(String... args) throws Exception {
+	// 	System.out.println(this.passwordEncoder.encode("xyz"));
 		
-		try {
-			Role role1=new Role();
-			role1.setId(AppConstants.NORMAL_USER);
-			role1.setName("ROLE_NORMAL");
-			Role role2=new Role();
-			role2.setId(AppConstants.ADMIN_USER);
-			role2.setName("ROLE_ADMIN");
-			List<Role> roles = List.of(role1,role2);
-			this.roleRepo.saveAll(roles);
+	// 	try {
+	// 		Role role1=new Role();
+	// 		role1.setId(AppConstants.NORMAL_USER);
+	// 		role1.setName("ROLE_NORMAL");
+	// 		Role role2=new Role();
+	// 		role2.setId(AppConstants.ADMIN_USER);
+	// 		role2.setName("ROLE_ADMIN");
+	// 		List<Role> roles = List.of(role1,role2);
+	// 		this.roleRepo.saveAll(roles);
 			
 			
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	// 	}
+	// 	catch (Exception e) {
+	// 		e.printStackTrace();
+	// 	}
+	// }
 
 }
